@@ -22,9 +22,13 @@ public class StorageImpl<K, V> implements Storage<K, V> {
             values[index] = value;
             return;
         }
-        keys[size] = key;
-        values[size] = value;
-        size++;
+
+        // Зауваження ментора: перевірка, щоб не перевищити ліміт у 10 елементів
+        if (size < MAX_SIZE) {
+            keys[size] = key;
+            values[size] = value;
+            size++;
+        }
     }
 
     @Override
@@ -41,6 +45,7 @@ public class StorageImpl<K, V> implements Storage<K, V> {
     // Вимога №5 та №6: винесена логіка та ручне порівняння без Objects.equals
     private int findKeyIndex(K key) {
         for (int i = 0; i < size; i++) {
+            // Порівнюємо посилання (для null) або вміст (для об'єктів)
             if (key == keys[i] || (key != null && key.equals(keys[i]))) {
                 return i;
             }
