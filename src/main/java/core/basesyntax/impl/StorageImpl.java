@@ -1,7 +1,6 @@
 package core.basesyntax.impl;
 
 import core.basesyntax.Storage;
-import java.util.Objects;
 
 public class StorageImpl<K, V> implements Storage<K, V> {
     private static final int MAX_SIZE = 10;
@@ -13,15 +12,15 @@ public class StorageImpl<K, V> implements Storage<K, V> {
     public StorageImpl() {
         this.keys = (K[]) new Object[MAX_SIZE];
         this.values = (V[]) new Object[MAX_SIZE];
+        this.size = 0; // Вимога №2: ініціалізація в конструкторі
     }
 
     @Override
     public void put(K key, V value) {
-        for (int i = 0; i < size; i++) {
-            if (Objects.equals(keys[i], key)) {
-                values[i] = value;
-                return;
-            }
+        int index = findKeyIndex(key); // Вимога №5: використовуємо допоміжний метод
+        if (index != -1) {
+            values[index] = value;
+            return;
         }
         keys[size] = key;
         values[size] = value;
@@ -30,16 +29,22 @@ public class StorageImpl<K, V> implements Storage<K, V> {
 
     @Override
     public V get(K key) {
-        for (int i = 0; i < size; i++) {
-            if (Objects.equals(keys[i], key)) {
-                return values[i];
-            }
-        }
-        return null;
+        int index = findKeyIndex(key);
+        return index != -1 ? values[index] : null;
     }
 
     @Override
     public int size() {
         return size;
+    }
+
+    // Вимога №5 та №6: винесена логіка та ручне порівняння без Objects.equals
+    private int findKeyIndex(K key) {
+        for (int i = 0; i < size; i++) {
+            if (key == keys[i] || (key != null && key.equals(keys[i]))) {
+                return i;
+            }
+        }
+        return -1;
     }
 }
